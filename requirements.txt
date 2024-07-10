@@ -1,0 +1,10 @@
+fastapi==0.111.0
+uvicorn==0.30.1
+alembic==1.13.2
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.31
+asyncpg==0.29.0
+crud==0.1
+python-dotenv==1.0.1
+redis==5.0.7
+aioredis==2.0.1

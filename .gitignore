@@ -1,0 +1,10 @@
+__pycache__/
+*.env
+*.env.*
+.env.*
+
+*.ini
+
+# 개발 환경 파일 제외
+.vscode/
+.idea/
