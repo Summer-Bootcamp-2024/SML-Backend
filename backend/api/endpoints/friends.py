@@ -1,29 +1,25 @@
-# from fastapi import APIRouter
-#
-# from Backend.backend.models.friends import Friend
-# from Backend.backend.schemas import friends_schema
-# from Backend.backend.database import async_session
-#
-# router = APIRouter()
-#
-# # 일촌 요청
-# @router.post("")
-# async def request_friend(friend: friends_schema.RequestFriend):
-#     async with async_session() as session:
-#         new_friend = Friend(**friend.dict())
-#         session.add(new_friend)
-#         await session.commit()
-#         await session.refresh(new_friend)
-#         return new_friend
-#
-# # @router.get("/users/{user_id}")
-# # async def read_user(user_id: int):
-# #     async with async_session() as session:
-# #         user = await session.get(User, user_id)
-# #         if not user:
-# #             raise HTTPException(status_code=404, detail="User not found")
-# #         return user
-#
+from http.client import HTTPException
+
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from Backend.backend.crud.friend_crud import request_friend
+from Backend.backend.database import get_db
+from Backend.backend.schemas.friend.friends_request import FriendRequest
+
+router = APIRouter()
+# 일촌 요청
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def post_request_friend(request: FriendRequest, db: AsyncSession = Depends(get_db)):
+    try:
+        await request_friend(db, request.user_id, request.friend_id)
+        return {"code": "success", "message": "Friend request sent successfully."}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to process friend request")
+
 # # 일촌 요청 수락/거절
 # # @router.put("{id}")
 #
