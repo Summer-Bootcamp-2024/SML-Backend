@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from Backend.backend.crud.friend_crud import request_friend, get_pending_friend
 from Backend.backend.database import get_db
 from Backend.backend.schemas.friend.friends_request import FriendRequest
-from Backend.backend.schemas.friend.friends_response import FriendResponse
+from Backend.backend.schemas.friend.friends_pending import FriendPending
 
 router = APIRouter()
 # 일촌 요청
@@ -22,7 +22,7 @@ async def post_request_friend(request: FriendRequest, db: AsyncSession = Depends
         raise HTTPException(status_code=500, detail="Failed to post_request_friend")
 
 # 일촌 요청 조회
-@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=List[FriendResponse])
+@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=List[FriendPending])
 async def get_request_friend(user_id: int, db: AsyncSession = Depends(get_db)):
     try:
         db_friend = await get_pending_friend(db, user_id)
