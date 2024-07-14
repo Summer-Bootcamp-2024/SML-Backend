@@ -42,17 +42,28 @@ async def get_pending_friend(db: AsyncSession, friend_id: int):
         raise ValueError("존재하지 않는 user_id이거나 status == pending이 존재하지 않음")
     return friend_list
 
-# async def accept_friend(db: AsyncSession, user_id: int):
-#     result = await db.execute(
-#         select(Friend).where(
-#             and_(Friend.friend_id == user_id, Friend.status == "pending")
-#         )
-#     )
+async def accept_friend(db: AsyncSession, friend_id: int, user_id: int, status: str):
+    if status not in ["accepted", "rejected"]:
+        raise ValueError("유효하지 않은 status 값입니다.")
 
-# 1. accept로 바꾸고, user_id == 1 and friend_id == 2 레코드를 하나 더 만든다.
-# => 1 2 | 2 1 accept
-# 1 친구 목록리스트 1
-#
-# 2. 1 2 accept
-# user_id == 2 and accepted
-# friend_id == 2 and accepted
+    result = await db.execute(
+        select(Friend).where(
+            or_(
+                and_(Friend.user_id == user_id, Friend.friend_id == friend_id, Friend.status == "pending"),
+                and_(Friend.user_id == friend_id, Friend.friend_id == user_id, Friend.status == "pending")
+            )
+        )
+    )
+
+    friends_to_update = result.scalars().all()
+
+    if not friends_to_update:
+        # 결과가 없으면 오류 발생
+        raise ValueError("pending인 친구 요청이 없습니다.")
+    else:
+        # 결과가 있으면 상태 업데이트
+        for friend in friends_to_update:
+            friend.status = status
+        # 데이터베이스에 커밋하여 변경 사항 저장
+        await db.commit()
+        return f"Status is updated to {status}"
