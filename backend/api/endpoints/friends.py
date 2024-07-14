@@ -10,10 +10,10 @@ from Backend.backend.schemas.friend.friends_pending import FriendPending
 
 router = APIRouter()
 # 일촌 요청
-@router.post("", status_code=status.HTTP_201_CREATED)
-async def post_request_friend(request: FriendRequest, db: AsyncSession = Depends(get_db)):
+@router.post("/{friend_id}", status_code=status.HTTP_201_CREATED)
+async def post_request_friend(friend_id: int, request: FriendRequest, db: AsyncSession = Depends(get_db)):
     try:
-        await request_friend(db, request.user_id, request.friend_id)
+        await request_friend(db, friend_id, request.user_id)
         return {"status": "success", "message": "Friend request sent successfully."}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
