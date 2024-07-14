@@ -3,10 +3,11 @@ from typing import List
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from Backend.backend.crud.friend_crud import request_friend, get_pending_friend
+from Backend.backend.crud.friend_crud import request_friend, get_pending_friend, accept_friend
 from Backend.backend.database import get_db
-from Backend.backend.schemas.friend.friends_request import FriendRequest
-from Backend.backend.schemas.friend.friends_pending import FriendPending
+from Backend.backend.schemas.friend.request.friends_request import FriendRequest
+from Backend.backend.schemas.friend.response.friends_pending import FriendPending
+from Backend.backend.schemas.friend.request.friends_accept import FriendAccept
 
 router = APIRouter()
 # 일촌 요청
@@ -33,7 +34,16 @@ async def get_request_friend(friend_id: int, db: AsyncSession = Depends(get_db))
         await db.rollback()
         raise HTTPException(500, "Failed to get_request_friend.")
 
-# # 일촌 요청 수락/거절
-# # @router.put("{id}")
-#
+# 일촌 요청 수락/거절
+@router.put("/{friend_id}", status_code=status.HTTP_200_OK)
+async def put_request_friend(friend_id: int, request: FriendAccept, db: AsyncSession = Depends(get_db)):
+    try:
+        message = await accept_friend(db, friend_id, request.user_id, request.status)
+        return {"status": "success", "message": message}
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(500, "Failed to put_request_friend.")
+
 
