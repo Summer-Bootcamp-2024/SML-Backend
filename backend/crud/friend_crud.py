@@ -31,10 +31,10 @@ async def request_friend(db: AsyncSession, friend_id: int, user_id: int):
     await db.refresh(responseFriend)
 
 
-async def get_pending_friend(db: AsyncSession, user_id: int):
+async def get_pending_friend(db: AsyncSession, friend_id: int):
     result = await db.execute(
         select(Friend).where(
-            and_(Friend.friend_id == user_id, Friend.status == "pending")
+            and_(Friend.friend_id == friend_id, Friend.status == "pending")
         )
     )
     friend_list = result.scalars().all()

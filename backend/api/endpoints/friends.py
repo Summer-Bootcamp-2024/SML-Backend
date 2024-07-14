@@ -22,10 +22,10 @@ async def post_request_friend(friend_id: int, request: FriendRequest, db: AsyncS
         raise HTTPException(status_code=500, detail="Failed to post_request_friend")
 
 # 일촌 요청 조회
-@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=List[FriendPending])
-async def get_request_friend(user_id: int, db: AsyncSession = Depends(get_db)):
+@router.get("/{friend_id}", status_code=status.HTTP_200_OK, response_model=List[FriendPending])
+async def get_request_friend(friend_id: int, db: AsyncSession = Depends(get_db)):
     try:
-        db_friend = await get_pending_friend(db, user_id)
+        db_friend = await get_pending_friend(db, friend_id)
         return db_friend
     except ValueError as e:
         raise HTTPException(400, str(e))
