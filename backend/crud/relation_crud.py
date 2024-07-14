@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from Backend.backend.models.friends import Friend
-from Backend.backend.schemas.friend.friends_related import FriendsFind
+from Backend.backend.schemas.friend.response.friends_related import FriendsFind
 
 
 async def get_friends(user_id: int, session: AsyncSession, depth: int = 1, max_depth: int = 3, visited: set = None) -> List[FriendsFind]:
