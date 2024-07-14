@@ -26,3 +26,14 @@ async def request_friend(db: AsyncSession, user_id: int, friend_id: int):
     db.add(new_friend)
     await db.commit()
     await db.refresh(new_friend)
+
+async def get_pending_friend(db: AsyncSession, user_id: int):
+    result = await db.execute(
+        select(Friend).where(
+            and_(Friend.friend_id == user_id, Friend.status == "pending")
+        )
+    )
+    friend_list = result.scalars().all()
+    if not friend_list:
+        raise ValueError("존재하지 않는 user_id이거나 status == pending이 존재하지 않음")
+    return friend_list
