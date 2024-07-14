@@ -4,9 +4,8 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from Backend.backend.crud.relation_crud import get_friends
-from Backend.backend.schemas.friend import friends_related
 from Backend.backend.database import get_db
-from Backend.backend.schemas.friend.friends_related import FriendsFind
+from Backend.backend.schemas.friend.response.friends_related import FriendsFind
 
 router = APIRouter()
 
