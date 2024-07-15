@@ -6,8 +6,6 @@ from Backend.backend.models.user import User
 from Backend.backend.schemas.user.user_create import UserCreate
 from Backend.backend.schemas.user.user_update import UserUpdate
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 async def get_user(db: AsyncSession, user_id: int):
     result = await db.execute(select(User).filter(User.id == user_id))
     return result.scalars().first()
@@ -33,11 +31,6 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
         await db.commit()
         await db.refresh(db_user)
     return db_user
-
-# 유틸리티 함수
-def update_user_data(db_user, user_update: UserUpdate):
-    for key, value in user_update.dict(exclude_unset=True).items():
-        setattr(db_user, key, value)
 
 async def delete_user(db: AsyncSession, user_id: int):
     db_user = await get_user(db, user_id)
