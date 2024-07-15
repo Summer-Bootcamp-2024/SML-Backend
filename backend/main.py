@@ -6,8 +6,7 @@ from Backend.backend.database import create_tables
 from Backend.backend.utils.redis_connection import get_redis_connection
 
 origins = [
-    "http://localhost",
-    "http://localhost:8000",
+    "*"
 ]
 app = FastAPI()
 app.add_middleware(
