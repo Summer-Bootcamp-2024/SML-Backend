@@ -3,7 +3,6 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from Backend.backend.database import get_db
-from Backend.backend.models.chatrooms import ChatRoom
 from Backend.backend.crud.chatroom_crud import create_chatroom, get_chatroom
 from Backend.backend.schemas.chat.chatroom_create import ChatroomCreate
 

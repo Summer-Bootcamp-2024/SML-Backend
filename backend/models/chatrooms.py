@@ -1,9 +1,7 @@
-# models/chatrooms.py
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 from Backend.backend.models.user import User
 from Backend.backend.database import Base
 

@@ -22,7 +22,6 @@ async def login_user(user: UserLogin, response: Response, db: AsyncSession = Dep
 
     # 세션 생성 및 Redis에 저장
     session_id = generate_session_id()
-    # await app.state.redis.set(session_id, user.email)
     await redis.set(session_id, user.email)
 
     # 세션 ID를 쿠키에 저장
@@ -41,7 +40,6 @@ async def logout_user(response: Response, session_id: str = Cookie(None), db: As
         raise HTTPException(status_code=400, detail="Not logged in")
 
     # 세션 ID를 키로 사용하여 저장된 이메일 가져옮
-    # email = await app.state.redis.get(session_id)
     email = await redis.get(session_id)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid session")
