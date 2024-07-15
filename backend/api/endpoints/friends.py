@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from Backend.backend.crud.friend_crud import request_friend, get_pending_friend, accept_friend
+from Backend.backend.crud.friend_crud import request_friend, get_pending_friend, accept_friend, list_friend
 from Backend.backend.database import get_db
 from Backend.backend.schemas.friend.request.friends_request import FriendRequest
 from Backend.backend.schemas.friend.response.friends_pending import FriendPending
@@ -46,4 +46,14 @@ async def put_request_friend(friend_id: int, request: FriendAccept, db: AsyncSes
         await db.rollback()
         raise HTTPException(500, "Failed to put_request_friend.")
 
-
+# 일촌 리스트 조회
+@router.get("/list/{user_id}", status_code=status.HTTP_200_OK, response_model=List[FriendPending])
+async def get_friend_list(user_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        db_friend = await list_friend(db, user_id)
+        return db_friend
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(500, "Failed to get_friend_list.")
