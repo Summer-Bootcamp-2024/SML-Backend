@@ -79,5 +79,28 @@ async def list_friend(db: AsyncSession, user_id: int):
     )
     friend_list = result.scalars().all()
     if not friend_list:
-        raise ValueError("존재하지 않는 user_id이거나 친구가 존재하지 않음")
+        raise ValueError("존재하지 않는 user_id이거나 친구가 존재하지 않음.")
     return friend_list
+
+# 일촌 삭제
+async def remove_friend(db: AsyncSession, friend_id: int, user_id: int):
+    result = await db.execute(
+        select(Friend).where(
+            or_(
+                and_(Friend.friend_id == friend_id, Friend.user_id == user_id, Friend.status == "accepted", Friend.is_deleted == False),
+                and_(Friend.friend_id == user_id, Friend.user_id == friend_id, Friend.status == "accepted", Friend.is_deleted == False)
+            )
+        )
+    )
+    # 조건에 맞는 쿼리로 가져옴
+    deleted_friend = result.scalars().all()
+
+    # deleted_friend가 없는 경우 Error
+    if not deleted_friend:
+        raise ValueError("존재하지 않는 user_id이거나 friend_id이다. 혹은 친구가 존재하지 않음.")
+    # deleted_friend가 있는 경우
+    else:
+        # 두 개의 레코드에 대해서 is_deleted = true로 변경
+        for friend in deleted_friend:
+            friend.is_deleted = True
+        await db.commit()
