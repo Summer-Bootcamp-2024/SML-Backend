@@ -29,8 +29,8 @@ async def login_user(user: UserLogin, response: Response, db: AsyncSession = Dep
 
     # 로그인 성공 시 사용자 상태를 "온라인"으로 업데이트
     db_user.status = "온라인"
+    return {"message": "Login successful", "user_id": db_user.id}
     await db.commit()  # 데이터베이스에 변경사항을 커밋
-    return {"message": "Login successful"}
 
 
 # 사용자 로그아웃
