@@ -1,0 +1,15 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
+from Backend.backend.models.user import User
+
+async def update_credit(db: AsyncSession, user_id: int, credit: int):
+    result = await db.execute(select(User).filter(User.id == user_id))
+    user = result.scalars().first()
+
+    if user:
+        user.credit += credit
+        await db.commit()
+        await db.refresh(user)
+
+    return user
