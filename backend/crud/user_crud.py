@@ -47,6 +47,6 @@ async def delete_user(db: AsyncSession, user_id: int):
     if db_user:
         await db.delete(db_user)
         await db.commit()
-        await es.delete(index="users", id=db_user.id)
+        es.delete(index="users", id=db_user.id)
 
     return db_user
