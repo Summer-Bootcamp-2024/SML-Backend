@@ -2,8 +2,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from Backend.backend.models.user import User
+from Backend.backend.schemas.search.search_schema import UserSearchResult
 from Backend.backend.schemas.user.user_create import UserCreate
 from Backend.backend.schemas.user.user_update import UserUpdate
+from Backend.backend.utils.index_user import es
+
 
 async def get_user(db: AsyncSession, user_id: int):
     result = await db.execute(select(User).filter(User.id == user_id))
@@ -20,6 +23,10 @@ async def create_user(db: AsyncSession, user: UserCreate):
     db.add(db_user)
     await db.commit()
     await db.refresh(db_user)
+
+    user_data = UserSearchResult.from_orm(db_user)
+    await es.index(index="users", id=db_user.id, body=user_data.dict())
+
     return db_user
 
 async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
@@ -29,6 +36,10 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
             setattr(db_user, key, value)
         await db.commit()
         await db.refresh(db_user)
+
+        user_data = UserSearchResult.from_orm(db_user)
+        await es.index(index="users", id=db_user.id, body=user_data.dict())
+
     return db_user
 
 async def delete_user(db: AsyncSession, user_id: int):
@@ -36,4 +47,6 @@ async def delete_user(db: AsyncSession, user_id: int):
     if db_user:
         await db.delete(db_user)
         await db.commit()
+        await es.delete(index="users", id=db_user.id)
+
     return db_user

@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 from pydantic import BaseModel
 
 class UserSearchResult(BaseModel):
@@ -14,6 +14,7 @@ class UserSearchResult(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 class SearchFilters(BaseModel):
     user_id: int

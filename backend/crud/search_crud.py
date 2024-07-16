@@ -7,16 +7,19 @@ from Backend.backend.crud.relation_crud import get_friends
 from Backend.backend.schemas.search.search_schema import UserSearchResult, SearchFilters
 from fastapi import HTTPException
 from elasticsearch import Elasticsearch
+from Backend.backend.utils.index_user import es
 
-es = Elasticsearch("http://elasticsearch:9200")
 
 async def search_users_by_filters(filters: SearchFilters, session: AsyncSession) -> List[UserSearchResult]:
     user_id = filters.user_id
     search = filters.search
+
+    # 친구 목록 가져옴
     friends = await get_friends(user_id, session)
     if not friends:
         return []
 
+    # 친구 ID 리스트 생성
     friend_ids = [friend.friend_id for friend in friends]
 
     # 중복 제거
