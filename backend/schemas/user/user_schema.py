@@ -15,6 +15,7 @@ class User(BaseModel):
     company: Optional[str] = None
     category: Optional[str] = None
     image_url: Optional[str] = None
+    credit: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
