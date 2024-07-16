@@ -1,6 +1,8 @@
+from sqlalchemy import delete, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from Backend.backend.models.friends import Friend
 from Backend.backend.models.user import User
 from Backend.backend.schemas.search.search_schema import UserSearchResult
 from Backend.backend.schemas.user.user_create import UserCreate
@@ -45,6 +47,7 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
 async def delete_user(db: AsyncSession, user_id: int):
     db_user = await get_user(db, user_id)
     if db_user:
+        await db.execute(delete(Friend).where(or_(Friend.user_id == user_id, Friend.friend_id == user_id)))
         await db.delete(db_user)
         await db.commit()
         es.delete(index="users", id=db_user.id)
