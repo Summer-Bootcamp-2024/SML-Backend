@@ -10,6 +10,7 @@ class ChatroomCreate(BaseModel):
     created_at: Optional[datetime] = datetime.now()
     updated_at: Optional[datetime] = datetime.now()
 
+
     class Config:
         orm_mode = True
 

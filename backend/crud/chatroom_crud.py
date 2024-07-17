@@ -24,8 +24,8 @@ async def create_chatroom(chatroom: ChatroomCreate, session: AsyncSession) -> Ch
     new_chatroom = ChatRoom(
         user1_id=chatroom.user1_id,
         user2_id=chatroom.user2_id,
-        created_at=chatroom.created_at or datetime.datetime.utcnow(),
-        updated_at=chatroom.updated_at or datetime.datetime.utcnow()
+        created_at=chatroom.created_at or datetime.utcnow(),
+        updated_at=chatroom.updated_at or datetime.utcnow()
     )
     session.add(new_chatroom)
     await session.commit()
@@ -43,6 +43,7 @@ async def get_chatroom(user_id: int, session: AsyncSession) -> List[ChatroomResp
     )
     result = await session.execute(query)
     chatrooms = result.scalars().all()
+
 
     response = []
     for chatroom in chatrooms:
@@ -62,3 +63,4 @@ async def get_chatroom(user_id: int, session: AsyncSession) -> List[ChatroomResp
         })
 
     return response
+
