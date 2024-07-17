@@ -1,8 +1,14 @@
-from fastapi import FastAPI
+from datetime import datetime
+from pathlib import Path
+from sqlalchemy.ext.asyncio import AsyncSession
+from Backend.backend.crud.message_crud import create_message
+from Backend.backend.schemas.chat.messages import MessageCreate
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 from starlette.middleware.cors import CORSMiddleware
-
+from fastapi.responses import HTMLResponse
 from Backend.backend.api.api import api_router
-from Backend.backend.database import create_tables
+from Backend.backend.database import create_tables, get_db
+from Backend.backend.utils.chat import manager
 from Backend.backend.utils.redis_connection import get_redis_connection
 
 origins = [
@@ -27,9 +33,33 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    app.state.redis.close()
+    await app.state.redis.aclose()
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    index_path = Path(__file__).parent / "templates" / "index.html"
+    return HTMLResponse(index_path.read_text())
 
+@app.websocket("/ws/{room_id}/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, room_id: int, client_id: int, session: AsyncSession = Depends(get_db)):
+    await manager.connect(websocket, room_id)  # WebSocket 연결 처리
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print(f"Received message: {data}")
+
+            # 메시지를 데이터베이스에 저장
+            message_data = MessageCreate(
+                room_id=room_id,
+                sender_id=client_id,
+                content=data,
+                timestamp=datetime.utcnow()
+            )
+            await create_message(message_data, session)
+
+            # 모든 연결된 클라이언트에게 메시지 브로드캐스트
+            message = f"Client #{client_id} in room #{room_id} says: {data}"
+            await manager.send_message(room_id, message)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, room_id)
+        await manager.send_message(room_id, f"Client #{client_id} has left the room {room_id}")

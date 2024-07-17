@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+<h1>WebSocket Chat</h1>
+<h2>Your ID: <span id="ws-id"></span></h2>
+<h3>Room ID: <input type="text" id="room-id" value="1"/></h3>
+<form action="" onsubmit="sendMessage(event)">
+    <input type="text" id="messageText" autocomplete="off"/>
+    <button>Send</button>
+</form>
+<ul id='messages'>
+</ul>
+<script>
+    // var client_id = Date.now();
+    var client_id  = Math.floor(Math.random() * 10);
+
+    document.querySelector("#ws-id").textContent = client_id;
+    function connectWebSocket() {
+        var room_id = document.getElementById('room-id').value;
+        var ws = new WebSocket(`ws://localhost:8000/ws/${room_id}/${client_id}`);
+        ws.onmessage = function (event) {
+            var messages = document.getElementById('messages');
+            var message = document.createElement('li');
+            var content = document.createTextNode(event.data);
+            message.appendChild(content);
+            messages.appendChild(message);
+        };
+        return ws;
+    }
+
+    var ws = connectWebSocket();
+
+    function sendMessage(event) {
+        var input = document.getElementById("messageText");
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(input.value);
+        } else {
+            console.error('WebSocket is not open');
+        }
+        input.value = '';
+        event.preventDefault();
+    }
+
+    // Optionally handle room changes
+    document.getElementById('room-id').addEventListener('change', function () {
+        if (ws) {
+            ws.close(); // Close the old connection
+        }
+        ws = connectWebSocket(); // Create a new connection
+    });
+</script>
+</body>
+</html>
+
