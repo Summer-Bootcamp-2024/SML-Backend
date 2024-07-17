@@ -12,7 +12,7 @@ from Backend.backend.utils.chat import manager
 from Backend.backend.utils.redis_connection import get_redis_connection
 
 origins = [
-    "*"
+ "http://localhost:5173"
 ]
 app = FastAPI()
 app.add_middleware(
