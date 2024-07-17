@@ -27,7 +27,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
     await db.refresh(db_user)
 
     user_data = UserSearchResult.from_orm(db_user)
-    await es.index(index="users", id=db_user.id, body=user_data.dict())
+    es.index(index="users", id=db_user.id, body=user_data.dict())
 
     return db_user
 
@@ -40,7 +40,7 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
         await db.refresh(db_user)
 
         user_data = UserSearchResult.from_orm(db_user)
-        await es.index(index="users", id=db_user.id, body=user_data.dict())
+        es.index(index="users", id=db_user.id, body=user_data.dict())
 
     return db_user
 
