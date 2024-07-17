@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import List
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import selectinload
 from Backend.backend.models.user import User
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from Backend.backend.models.chatrooms import ChatRoom
-from Backend.backend.schemas.chat.chatroom_create import ChatroomCreate, ChatroomResponse
+from Backend.backend.schemas.chat.chatroom_create import ChatroomCreate, ChatroomResponse, ChatroomResponse2
 
 
 async def create_chatroom(chatroom: ChatroomCreate, session: AsyncSession) -> ChatRoom:
@@ -32,26 +32,33 @@ async def create_chatroom(chatroom: ChatroomCreate, session: AsyncSession) -> Ch
     await session.refresh(new_chatroom)
     return new_chatroom
 
-
-async def get_chatroom(user_id: int, session: AsyncSession) -> List[ChatRoom]:
-    query = select(ChatRoom).options(
-        joinedload(ChatRoom.user1).load_only(User.id, User.image_url),
-        joinedload(ChatRoom.user2).load_only(User.id, User.image_url)
-    ).where((ChatRoom.user1_id == user_id) | (ChatRoom.user2_id == user_id))
-
+async def get_chatroom(user_id: int, session: AsyncSession) -> List[ChatroomResponse2]:
+    query = (
+        select(ChatRoom)
+        .options(
+            selectinload(ChatRoom.user1),
+            selectinload(ChatRoom.user2),
+        )
+        .where((ChatRoom.user1_id == user_id) | (ChatRoom.user2_id == user_id))
+    )
     result = await session.execute(query)
     chatrooms = result.scalars().all()
 
-    return [
-        ChatroomResponse(
-            id=chatroom.id,
-            user1_id=chatroom.user1_id,
-            user1_name=chatroom.user1.name,
-            user1_image_url=chatroom.user1.image_url,
-            user2_id=chatroom.user2_id,
-            user2_name=chatroom.user2.name,
-            user2_image_url=chatroom.user2.image_url,
-            created_at=chatroom.created_at,
-            updated_at=chatroom.updated_at
-        ) for chatroom in chatrooms
-    ]
+    response = []
+    for chatroom in chatrooms:
+        user1 = chatroom.user1
+        user2 = chatroom.user2
+
+        response.append({
+            "id": chatroom.id,
+            "user1_id": user1.id,
+            "user1_name": user1.name,
+            "user1_image_url": user1.image_url,
+            "user2_id": user2.id,
+            "user2_name": user2.name,
+            "user2_image_url": user2.image_url,
+            "created_at": chatroom.created_at,
+            "updated_at": chatroom.updated_at,
+        })
+
+    return response
