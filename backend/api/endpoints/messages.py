@@ -8,9 +8,6 @@ from Backend.backend.schemas.chat.messages import MessageCreate, MessageResponse
 
 router = APIRouter()
 
-# @router.post("/", response_model=MessageResponse)
-# async def post_message(message: MessageCreate, session: AsyncSession = Depends(get_db)):
-#     return await create_message(message, session)
 
 @router.get("/{room_id}", response_model=List[MessageResponse])
 async def get_room_messages(room_id: int, session: AsyncSession = Depends(get_db)):
