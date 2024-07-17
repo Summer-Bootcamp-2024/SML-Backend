@@ -7,6 +7,8 @@ from pydantic import BaseModel
 class ChatroomCreate(BaseModel):
     user1_id: int
     user2_id: int
+    created_at: Optional[datetime] = datetime.utcnow()
+    updated_at: Optional[datetime] = datetime.utcnow()
 
     class Config:
         orm_mode = True

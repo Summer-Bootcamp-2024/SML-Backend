@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from Backend.backend.models.chatrooms import ChatRoom
-from Backend.backend.schemas.chat.chatroom_create import ChatroomCreate, ChatroomResponse
+from Backend.backend.schemas.chat.chatroom_create import ChatroomCreate, ChatroomResponse, ChatroomResponse2
 
 
 async def create_chatroom(chatroom: ChatroomCreate, session: AsyncSession) -> ChatRoom:
@@ -24,8 +24,8 @@ async def create_chatroom(chatroom: ChatroomCreate, session: AsyncSession) -> Ch
     new_chatroom = ChatRoom(
         user1_id=chatroom.user1_id,
         user2_id=chatroom.user2_id,
-        created_at=chatroom.created_at or datetime.datetime.utcnow(),
-        updated_at=chatroom.updated_at or datetime.datetime.utcnow()
+        created_at=chatroom.created_at or datetime.utcnow(),
+        updated_at=chatroom.updated_at or datetime.utcnow()
     )
     session.add(new_chatroom)
     await session.commit()
@@ -43,7 +43,7 @@ async def get_chatroom(user_id: int, session: AsyncSession) -> List[ChatRoom]:
     chatrooms = result.scalars().all()
 
     return [
-        ChatroomResponse(
+        ChatroomResponse2(
             id=chatroom.id,
             user1_id=chatroom.user1_id,
             user1_name=chatroom.user1.name,
