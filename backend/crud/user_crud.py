@@ -22,6 +22,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
         region=user.region,
         gender=user.gender
     )
+
     db.add(db_user)
     await db.commit()
     await db.refresh(db_user)
@@ -36,6 +37,7 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
     if db_user:
         for key, value in user_update.dict(exclude_unset=True).items():
             setattr(db_user, key, value)
+
         await db.commit()
         await db.refresh(db_user)
 
@@ -50,6 +52,7 @@ async def delete_user(db: AsyncSession, user_id: int):
         await db.execute(delete(Friend).where(or_(Friend.user_id == user_id, Friend.friend_id == user_id)))
         await db.delete(db_user)
         await db.commit()
+
         es.delete(index="users", id=db_user.id)
 
     return db_user
