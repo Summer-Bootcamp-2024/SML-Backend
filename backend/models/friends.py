@@ -11,8 +11,8 @@ class Friend(Base):
     )
 
     id = Column(BigInteger, primary_key=True, index=True)
-    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
-    friend_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    friend_id = Column(BigInteger, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     status = Column(String(255))
     is_deleted = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP, server_default=func.now())

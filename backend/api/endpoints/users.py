@@ -54,8 +54,14 @@ async def update_user_endpoint(id: int, user_update: UserUpdate, session_id: str
 
 # 사용자 프로필 삭제
 @router.delete("/{id}", response_model=User)
-async def delete_user_endpoint(id: int, db: AsyncSession = Depends(get_db)):
+async def delete_user_endpoint(id: int, session_id: str = Cookie(None), db: AsyncSession = Depends(get_db), redis=Depends(get_redis_connection)):
+    # 사용자 삭제
     db_user = await delete_user(db, user_id=id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+
+    # 세션 ID 확인 및 제거
+    if session_id:
+        await redis.delete(session_id)
+
     return db_user
