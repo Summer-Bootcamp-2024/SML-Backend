@@ -9,8 +9,8 @@ class ChatRoom(Base):
     __tablename__ = 'chatrooms'
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user1_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    user2_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user1_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user2_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
