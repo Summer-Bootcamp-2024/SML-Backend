@@ -13,3 +13,6 @@ def index_users(users: List[UserSearchResult]):
     for user in users:
         user_dict = user.dict()
         es.index(index="users", id=user.id, body=user_dict)
+
+
+# 인덱스를 못가져옴 버그 발생
