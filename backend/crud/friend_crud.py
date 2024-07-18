@@ -62,13 +62,17 @@ async def accept_friend(db: AsyncSession, friend_id: int, user_id: int, status: 
     if not friends_to_update:
         # 결과가 없으면 오류 발생
         raise ValueError("pending인 친구 요청이 없습니다.")
+    elif status == "rejected":
+        # 거절인 경우 불필요한 데이터이므로 삭제
+        for friend in friends_to_update:
+            await db.delete(friend)
     else:
-        # 결과가 있으면 상태 업데이트
+        # 수락인 경우
         for friend in friends_to_update:
             friend.status = status
-        # 데이터베이스에 커밋하여 변경 사항 저장
-        await db.commit()
-        return f"Status is updated to {status}"
+    # 데이터베이스에 커밋하여 변경 사항 저장
+    await db.commit()
+    return f"Status is updated to {status}"
 
 # 일촌 리스트 조회
 async def list_friend(db: AsyncSession, user_id: int):
