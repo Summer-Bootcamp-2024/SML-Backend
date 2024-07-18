@@ -3,23 +3,26 @@ from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from Backend.backend.crud.message_crud import create_message
 from Backend.backend.models.user import User
-from Backend.backend.schemas.chat.messages import MessageCreate
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from Backend.backend.api.api import api_router
+from Backend.backend.api.endpoints import introduction_request  # 추가
 from Backend.backend.database import create_tables, get_db
 from Backend.backend.schemas.search.search_schema import UserSearchResult
 from Backend.backend.utils.chat import manager
 from Backend.backend.utils.index_user import index_users
 from Backend.backend.utils.redis_connection import get_redis_connection
+from Backend.backend.crud.message_crud import create_message
+from Backend.backend.schemas.chat.messages import MessageCreate
 
 origins = [
- "http://localhost:5173"
+    "http://localhost:5173"
 ]
+
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -27,9 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(api_router)
 
-# main.py에서는 이렇게 사용
+app.include_router(api_router)
+app.include_router(introduction_request.router, prefix="/api/v1/introduction_requests", tags=["Introduction Requests"])  # 추가
 
 @app.on_event("startup")
 async def startup_event():
