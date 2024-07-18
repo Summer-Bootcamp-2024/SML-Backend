@@ -74,7 +74,7 @@ async def accept_friend(db: AsyncSession, friend_id: int, user_id: int, status: 
 async def list_friend(db: AsyncSession, user_id: int):
     result = await db.execute(
         select(Friend).where(
-            and_(Friend.user_id == user_id, Friend.status == "accepted", Friend.is_deleted == False)
+            and_(Friend.user_id == user_id, Friend.status == "accepted")
         )
     )
     friend_list = result.scalars().all()
@@ -87,8 +87,8 @@ async def remove_friend(db: AsyncSession, friend_id: int, user_id: int):
     result = await db.execute(
         select(Friend).where(
             or_(
-                and_(Friend.friend_id == friend_id, Friend.user_id == user_id, Friend.status == "accepted", Friend.is_deleted == False),
-                and_(Friend.friend_id == user_id, Friend.user_id == friend_id, Friend.status == "accepted", Friend.is_deleted == False)
+                and_(Friend.friend_id == friend_id, Friend.user_id == user_id, Friend.status == "accepted"),
+                and_(Friend.friend_id == user_id, Friend.user_id == friend_id, Friend.status == "accepted")
             )
         )
     )
@@ -102,5 +102,5 @@ async def remove_friend(db: AsyncSession, friend_id: int, user_id: int):
     else:
         # 두 개의 레코드에 대해서 is_deleted = true로 변경
         for friend in deleted_friend:
-            friend.is_deleted = True
+            await db.delete(friend)
         await db.commit()

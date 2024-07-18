@@ -1,13 +1,18 @@
 from datetime import datetime
 from pathlib import Path
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from Backend.backend.models.user import User
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from Backend.backend.api.api import api_router
 from Backend.backend.api.endpoints import introduction_request  # 추가
 from Backend.backend.database import create_tables, get_db
+from Backend.backend.schemas.search.search_schema import UserSearchResult
 from Backend.backend.utils.chat import manager
+from Backend.backend.utils.index_user import index_users
 from Backend.backend.utils.redis_connection import get_redis_connection
 from Backend.backend.crud.message_crud import create_message
 from Backend.backend.schemas.chat.messages import MessageCreate
@@ -33,6 +38,14 @@ app.include_router(introduction_request.router, prefix="/api/v1/introduction_req
 async def startup_event():
     await create_tables()
     app.state.redis = get_redis_connection()
+
+    # 유저 데이터를 인덱싱
+    async for session in get_db():
+        result = await session.execute(select(User))
+        users = result.scalars().all()
+        user_search_results = [UserSearchResult.from_orm(user) for user in users]
+        index_users(user_search_results)
+        break  # 한번만 실행하고 break해서 async for 루프 종료해줘야됨
 
 @app.on_event("shutdown")
 async def shutdown_event():

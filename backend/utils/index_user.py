@@ -4,8 +4,7 @@ from elasticsearch import Elasticsearch
 from Backend.backend.schemas.search.search_schema import UserSearchResult
 from Backend.backend.utils.es_setup import create_index
 
-es_host = os.getenv('ELASTICSEARCH_HOST', 'http://elasticsearch:9200')
-es = Elasticsearch(es_host)
+es = Elasticsearch(["http://elasticsearch:9200"])
 
 def index_users(users: List[UserSearchResult]):
     if not es.indices.exists(index="users"):
