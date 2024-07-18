@@ -32,7 +32,6 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
-app.include_router(introduction_request.router, prefix="/api/v1/introduction_requests", tags=["Introduction Requests"])  # 추가
 
 @app.on_event("startup")
 async def startup_event():

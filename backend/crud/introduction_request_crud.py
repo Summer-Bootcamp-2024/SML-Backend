@@ -13,18 +13,6 @@ class IntroductionRequestService:
         return introduction_request
 
     @staticmethod
-    async def get_introduction_requests(db: AsyncSession, user_id: int):
-        result = await db.execute(
-            select(IntroductionRequest).where(
-                and_(
-                    IntroductionRequest.intermediary_user_id == user_id,
-                    IntroductionRequest.status == "pending"
-                )
-            )
-        )
-        return result.scalars().all()
-
-    @staticmethod
     async def update_introduction_request(db: AsyncSession, request_id: int, status: str):
         result = await db.execute(
             select(IntroductionRequest).where(IntroductionRequest.id == request_id)

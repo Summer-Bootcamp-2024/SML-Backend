@@ -16,4 +16,4 @@ class ChatRoom(Base):
 
     user1 = relationship("User", foreign_keys=[user1_id])
     user2 = relationship("User", foreign_keys=[user2_id])
-    messages = relationship("Message", back_populates="chatroom")
+    # messages = relationship("Message", back_populates="chatroom")
