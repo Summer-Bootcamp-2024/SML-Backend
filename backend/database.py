@@ -22,7 +22,11 @@ DATABASE_URL = f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}/{db_name
 engine = create_async_engine(DATABASE_URL, echo=True)
 
 # 비동기 세션 생성
-async_session = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
+async_session = sessionmaker(
+    engine,
+    expire_on_commit=False,
+    class_=AsyncSession
+)
 
 Base = declarative_base()
 
