@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError, ClientError
+from fastapi import UploadFile, File, HTTPException
 
 load_dotenv()
 
@@ -9,6 +10,7 @@ bucket_name = os.getenv("S3_BUCKET_NAME")
 s3_region = os.getenv("S3_REGION")
 s3_access_key_id = os.getenv("S3_ACCESS_KEY_ID")
 s3_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
+default_profile_url = f"https://{bucket_name}.s3.{s3_region}.amazonaws.com/default_profile.png"
 
 class Connect:
     def __init__(self):
@@ -39,3 +41,11 @@ async def upload_image_to_s3(image_file: bytes, key_name: str):
         print(f"Error during image upload: {e}")
         return None
 
+async def create_s3_url(file: UploadFile = File(...)):
+    contents = await file.read()
+    key_name = file.filename
+    url = await upload_image_to_s3(contents, key_name)
+    if url:
+        return url
+    else:
+        raise HTTPException(status_code=500, detail="Failed to upload")
