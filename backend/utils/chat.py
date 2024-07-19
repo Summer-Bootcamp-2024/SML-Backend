@@ -6,10 +6,10 @@ class ChatRoom:
     def __init__(self):
         self.connections: List[WebSocket] = []
 
-    async def broadcast(self, message: str):
+    async def broadcast(self, message: Dict):
         for connection in self.connections:
             try:
-                await connection.send_text(message)
+                await connection.send_json(message)
             except RuntimeError:
                 pass
 
@@ -35,7 +35,7 @@ class ConnectionManager:
             if not self.rooms[room_id].connections:
                 del self.rooms[room_id]
 
-    async def send_message(self, room_id: int, message: str):
+    async def send_message(self, room_id: int, message: Dict):
         if room_id in self.rooms:
             await self.rooms[room_id].broadcast(message)
 
