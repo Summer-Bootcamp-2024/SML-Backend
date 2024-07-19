@@ -11,23 +11,52 @@
     <input type="text" id="messageText" autocomplete="off"/>
     <button>Send</button>
 </form>
-<ul id='messages'>
-</ul>
-<script>
-    // var client_id = Date.now();
-    var client_id  = Math.floor(Math.random() * 10);
+<ul id='messages'></ul>
 
+<script>
+    // Generate a unique client ID
+    var client_id = Math.floor(Math.random() * 10); // Increase the range to avoid collisions
+
+    // Display the client ID on the page
     document.querySelector("#ws-id").textContent = client_id;
+
     function connectWebSocket() {
         var room_id = document.getElementById('room-id').value;
         var ws = new WebSocket(`ws://localhost:8000/ws/${room_id}/${client_id}`);
+
+        // Handle incoming messages
         ws.onmessage = function (event) {
             var messages = document.getElementById('messages');
+            var messageData;
+
+            try {
+                // Parse the JSON message
+                messageData = JSON.parse(event.data);
+
+                // Create a display string
+                var displayMessage = `Client ${messageData.client_id} said: ${messageData.content} at ${messageData.timestamp}`;
+            } catch (error) {
+                // If JSON parsing fails, just display raw data
+                displayMessage = `Error parsing message: ${event.data}`;
+            }
+
+            // Create a new list item and append it to the messages list
             var message = document.createElement('li');
-            var content = document.createTextNode(event.data);
+            var content = document.createTextNode(displayMessage);
             message.appendChild(content);
             messages.appendChild(message);
         };
+
+        // Handle WebSocket errors
+        ws.onerror = function (error) {
+            console.error('WebSocket error:', error);
+        };
+
+        // Handle WebSocket closure
+        ws.onclose = function () {
+            console.log('WebSocket connection closed');
+        };
+
         return ws;
     }
 
@@ -54,4 +83,3 @@
 </script>
 </body>
 </html>
-

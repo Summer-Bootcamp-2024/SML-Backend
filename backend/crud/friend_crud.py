@@ -2,7 +2,10 @@ from sqlalchemy import select, or_, and_
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from Backend.backend.models.chatrooms import ChatRoom
 from Backend.backend.models.friends import Friend
+from Backend.backend.models.messages import Message
+
 
 # 일촌 요청
 async def request_friend(db: AsyncSession, friend_id: int, user_id: int):
@@ -88,6 +91,7 @@ async def list_friend(db: AsyncSession, user_id: int):
 
 # 일촌 삭제
 async def remove_friend(db: AsyncSession, friend_id: int, user_id: int):
+    # 1. 친구 관계 가져오기
     result = await db.execute(
         select(Friend).where(
             or_(
@@ -96,15 +100,38 @@ async def remove_friend(db: AsyncSession, friend_id: int, user_id: int):
             )
         )
     )
-    # 조건에 맞는 쿼리로 가져옴
     deleted_friend = result.scalars().all()
 
-    # deleted_friend가 없는 경우 Error
     if not deleted_friend:
         raise ValueError("존재하지 않는 user_id이거나 friend_id이다. 혹은 친구가 존재하지 않음.")
-    # deleted_friend가 있는 경우
-    else:
-        # 두 개의 레코드에 대해서 is_deleted = true로 변경
-        for friend in deleted_friend:
-            await db.delete(friend)
-        await db.commit()
+
+    # 2. 채팅방 가져오기
+    chatroom_result = await db.execute(
+        select(ChatRoom).where(
+            or_(
+                and_(ChatRoom.user1_id == user_id, ChatRoom.user2_id == friend_id),
+                and_(ChatRoom.user1_id == friend_id, ChatRoom.user2_id == user_id)
+            )
+        )
+    )
+    chatrooms = chatroom_result.scalars().all()
+
+    # 3. 메시지 삭제
+    for chatroom in chatrooms:
+        messages_result = await db.execute(
+            select(Message).where(Message.room_id == chatroom.id)
+        )
+        messages = messages_result.scalars().all()
+        for message in messages:
+            await db.delete(message)
+        await db.commit()  # 메시지 삭제 후 커밋
+
+    # 4. 채팅방 삭제
+    for chatroom in chatrooms:
+        await db.delete(chatroom)
+    await db.commit()  # 채팅방 삭제 후 커밋
+
+    # 5. 친구 관계 삭제
+    for friend in deleted_friend:
+        await db.delete(friend)
+    await db.commit()  # 친구 관계 삭제 후 커밋
