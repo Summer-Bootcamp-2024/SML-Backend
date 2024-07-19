@@ -72,9 +72,24 @@ async def websocket_endpoint(websocket: WebSocket, room_id: int, client_id: int,
             )
             await create_message(message_data, session)
 
+            # 현재 시각을 원하는 형식으로 변환
+            formatted_timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
             # 모든 연결된 클라이언트에게 메시지 브로드캐스트
-            message = f"Client #{client_id} in room #{room_id} says: {data}"
+            message = {
+                "client_id": client_id,
+                "room_id": room_id,
+                "content": data,
+                "timestamp": formatted_timestamp
+            }
             await manager.send_message(room_id, message)
     except WebSocketDisconnect:
         manager.disconnect(websocket, room_id)
-        await manager.send_message(room_id, f"Client #{client_id} has left the room {room_id}")
+        formatted_timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        leave_message = {
+            "client_id": client_id,
+            "room_id": room_id,
+            "content": f"Client #{client_id} has left the room {room_id}",
+            "timestamp": formatted_timestamp
+        }
+        await manager.send_message(room_id, leave_message)
