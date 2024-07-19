@@ -55,8 +55,8 @@ def read_root():
     index_path = Path(__file__).parent / "templates" / "index.html"
     return HTMLResponse(index_path.read_text())
 
-@app.websocket("/ws/{room_id}/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, room_id: int, client_id: int, session: AsyncSession = Depends(get_db)):
+@app.websocket("/ws/{room_id}/{sender_id}")
+async def websocket_endpoint(websocket: WebSocket, room_id: int, sender_id: int, session: AsyncSession = Depends(get_db)):
     await manager.connect(websocket, room_id)  # WebSocket 연결 처리
     try:
         while True:
@@ -66,7 +66,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: int, client_id: int,
             # 메시지를 데이터베이스에 저장
             message_data = MessageCreate(
                 room_id=room_id,
-                sender_id=client_id,
+                sender_id=sender_id,
                 content=data,
                 timestamp=datetime.utcnow()
             )
@@ -77,7 +77,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: int, client_id: int,
 
             # 모든 연결된 클라이언트에게 메시지 브로드캐스트
             message = {
-                "client_id": client_id,
+                "sender_id": sender_id,
                 "room_id": room_id,
                 "content": data,
                 "timestamp": formatted_timestamp
