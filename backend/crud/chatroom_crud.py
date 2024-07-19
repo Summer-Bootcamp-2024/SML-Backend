@@ -50,17 +50,17 @@ async def get_chatroom(user_id: int, session: AsyncSession) -> List[ChatroomResp
         user1 = chatroom.user1
         user2 = chatroom.user2
 
-        response.append({
-            "id": chatroom.id,
-            "user1_id": user1.id,
-            "user1_name": user1.name,
-            "user1_image_url": user1.image_url,
-            "user2_id": user2.id,
-            "user2_name": user2.name,
-            "user2_image_url": user2.image_url,
-            "created_at": chatroom.created_at,
-            "updated_at": chatroom.updated_at,
-        })
+        response.append(ChatroomResponse2(
+            id=chatroom.id,
+            user1_id=user1.id,
+            user1_name=user1.name,
+            user1_image_url=user1.image_url,
+            user2_id=user2.id,
+            user2_name=user2.name,
+            user2_image_url=user2.image_url,
+            created_at=chatroom.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            updated_at=chatroom.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+        ))
 
     return response
 
