@@ -1,8 +1,12 @@
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm import selectinload
+
+from Backend.backend.models.messages import Message
 from Backend.backend.models.user import User
-from fastapi import HTTPException
+from sqlalchemy import delete
+from fastapi import HTTPException, Response
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from Backend.backend.models.chatrooms import ChatRoom
@@ -64,3 +68,22 @@ async def get_chatroom(user_id: int, session: AsyncSession) -> List[ChatroomResp
 
     return response
 
+async def delete_chatroom(room_id: int, session: AsyncSession):
+    # 주어진 room_id에 해당하는 메시지 삭제
+    await session.execute(
+        delete(Message).where(Message.room_id == room_id)
+    )
+    await session.commit()
+
+    # 주어진 room_id에 해당하는 채팅방 삭제
+    result = await session.execute(
+        select(ChatRoom).where(ChatRoom.id == room_id)
+    )
+    chatroom = result.scalars().first()
+    if chatroom:
+        await session.delete(chatroom)
+        await session.commit()
+    else:
+        raise HTTPException(status_code=404, detail="Chatroom not found")
+
+    return Response(status_code=204)

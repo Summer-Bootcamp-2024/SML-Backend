@@ -19,7 +19,7 @@ async def get_user(db: AsyncSession, user_id: int):
 async def create_user(db: AsyncSession, user: UserCreate):
     db_user = User(
         email=user.email,
-        password=user.password,  # 비밀번호를 해시화하는 것이 좋습니다
+        password=user.password,
         name=user.name,
         region=user.region,
         gender=user.gender
