@@ -15,14 +15,6 @@ async def create_introduction_request(request: IntroductionRequestCreate, db: As
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# 소개 요청 조회
-@router.get("/", status_code=status.HTTP_200_OK, response_model=List[IntroductionRequest])
-async def get_introduction_requests(user_id: int, db: AsyncSession = Depends(get_db)):
-    try:
-        return await IntroductionRequestService.get_introduction_requests(db, user_id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
 # 소개 요청 수락/거절
 @router.put("/{request_id}", status_code=status.HTTP_200_OK, response_model=IntroductionRequest)
 async def update_introduction_request(request_id: int, status: IntroductionRequestUpdate, db: AsyncSession = Depends(get_db)):
