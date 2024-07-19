@@ -85,11 +85,3 @@ async def websocket_endpoint(websocket: WebSocket, room_id: int, client_id: int,
             await manager.send_message(room_id, message)
     except WebSocketDisconnect:
         manager.disconnect(websocket, room_id)
-        formatted_timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-        leave_message = {
-            "client_id": client_id,
-            "room_id": room_id,
-            "content": f"Client #{client_id} has left the room {room_id}",
-            "timestamp": formatted_timestamp
-        }
-        await manager.send_message(room_id, leave_message)
