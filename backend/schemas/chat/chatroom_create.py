@@ -37,3 +37,6 @@ class ChatroomResponse2(BaseModel):
 
     class Config:
         orm_mode = True
+
+class DeleteResponse(BaseModel):
+    detail: str

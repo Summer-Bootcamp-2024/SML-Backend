@@ -3,8 +3,9 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from Backend.backend.database import get_db
-from Backend.backend.crud.chatroom_crud import create_chatroom, get_chatroom
-from Backend.backend.schemas.chat.chatroom_create import ChatroomCreate, ChatroomResponse, ChatroomResponse2
+from Backend.backend.crud.chatroom_crud import create_chatroom, get_chatroom, delete_chatroom
+from Backend.backend.schemas.chat.chatroom_create import ChatroomCreate, ChatroomResponse, ChatroomResponse2, \
+    DeleteResponse
 
 router = APIRouter()
 
@@ -18,3 +19,7 @@ async def get_chatrooms(user_id: int, session: AsyncSession = Depends(get_db)):
     if not show_chatroom:
         raise HTTPException(status_code=404, detail="No chatrooms found")
     return show_chatroom
+
+@router.delete("/{room_id}", response_model=DeleteResponse)
+async def delete_chatrooms(room_id: int, session: AsyncSession = Depends(get_db)):
+    return await delete_chatroom(room_id, session)
