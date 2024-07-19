@@ -1,3 +1,4 @@
+from fastapi import UploadFile, File
 from sqlalchemy import delete, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -10,6 +11,7 @@ from Backend.backend.schemas.search.search_schema import UserSearchResult
 from Backend.backend.schemas.user.user_create import UserCreate
 from Backend.backend.schemas.user.user_update import UserUpdate
 from Backend.backend.utils.index_user import es
+from Backend.backend.utils.s3_util import create_s3_url
 
 
 async def get_user(db: AsyncSession, user_id: int):
@@ -33,7 +35,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
     es.index(index="users", id=db_user.id, body=user_data.dict())
 
     return db_user
-
+# 사용자 업데이트
 async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
     db_user = await get_user(db, user_id)
     if db_user:
@@ -48,6 +50,15 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
 
     return db_user
 
+# 사용자 프로필 이미지 업데이트
+async def update_profile_img(db: AsyncSession, user_id: int, file: UploadFile = File(...)):
+    db_user = await get_user(db, user_id)
+    db_user.image_url = await create_s3_url(file)
+
+    await db.commit()
+    await db.refresh(db_user)
+
+    return db_user
 
 # 사용자 삭제
 async def delete_user(session: AsyncSession, user_id: int) -> User:
@@ -85,3 +96,6 @@ async def delete_user(session: AsyncSession, user_id: int) -> User:
         await session.delete(user)
         await session.commit()
     return user
+
+
+

@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Cookie
+from fastapi import APIRouter, Depends, HTTPException, Cookie, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from Backend.backend.crud.auth_crud import get_user_by_email
-from Backend.backend.crud.user_crud import create_user, get_user, update_user, delete_user
+from Backend.backend.crud.user_crud import create_user, get_user, update_user, delete_user, update_profile_img
 from Backend.backend.database import get_db
 from Backend.backend.schemas.user.user_create import UserCreate
 from Backend.backend.schemas.user.user_schema import User
@@ -51,6 +50,27 @@ async def update_user_endpoint(id: int, user_update: UserUpdate, session_id: str
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+# 사용자 프로필 이미지 업데이트
+@router.put("/profile/{id}", response_model=User)
+async def update_profile_img_endpoint(id: int, session_id: str = Cookie(None), file: UploadFile = File(...), db: AsyncSession = Depends(get_db), redis=Depends(get_redis_connection)):
+    # redis에서 세션 ID를 사용해 이메일을 가져오기
+    email = await redis.get(session_id)
+    if email is None:
+        raise HTTPException(status_code=400, detail="Invalid session")
+
+    # 이메일을 사용해 데이터베이스에서 사용자 조회
+    db_user = await get_user_by_email(db, email=email.decode("utf-8"))
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    try:
+        user = await update_profile_img(db, id, file)
+        return user
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(500, "Failed to update profile image.")
 
 # 사용자 프로필 삭제
 @router.delete("/{id}", response_model=User)
