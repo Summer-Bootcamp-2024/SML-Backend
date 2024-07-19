@@ -11,4 +11,3 @@ class UserUpdate(BaseModel):
     company: Optional[str] = None
     region: Optional[str] = None
     category: Optional[str] = None
-    image_url: Optional[str] = None
