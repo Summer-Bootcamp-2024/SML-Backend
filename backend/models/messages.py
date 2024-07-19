@@ -11,6 +11,3 @@ class Message(Base):
     sender_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     content = Column(String, nullable=False)
     timestamp = Column(TIMESTAMP, default=datetime.utcnow)
-
-    # chatroom = relationship("ChatRoom", back_populates="messages")
-    # sender = relationship("User")
