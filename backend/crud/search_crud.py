@@ -1,12 +1,8 @@
-from typing import List, Set
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from Backend.backend.models.friends import Friend
-from Backend.backend.schemas.friend.response.friends_related import FriendsFind
 from Backend.backend.crud.relation_crud import get_friends
 from Backend.backend.schemas.search.search_schema import UserSearchResult, SearchFilters
 from fastapi import HTTPException
-from elasticsearch import Elasticsearch
 from Backend.backend.utils.index_user import es
 
 
@@ -27,7 +23,7 @@ async def search_users_by_filters(filters: SearchFilters, session: AsyncSession)
 
     # Elasticsearch 인덱스 매핑 확인
     index_mapping = es.indices.get_mapping(index="users")
-
+    print(index_mapping)
     # Elasticsearch 쿼리 구성
     try:
         query = {
@@ -77,7 +73,6 @@ async def search_users_by_filters(filters: SearchFilters, session: AsyncSession)
                 )
                 results.append(result)
                 seen_ids.add(source['id'])
-
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,5 +1,5 @@
 from fastapi import UploadFile, File
-from sqlalchemy import delete, or_
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -31,7 +31,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
     await db.commit()
     await db.refresh(db_user)
 
-    user_data = UserSearchResult(id=db_user.id, email=db_user.email, name=db_user.name, region=db_user.region, gender=db_user.gender)
+    user_data = UserSearchResult.from_orm(db_user)
     es.index(index="users", id=db_user.id, body=user_data.dict())
 
     return db_user
@@ -45,7 +45,7 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
         await db.commit()
         await db.refresh(db_user)
 
-        user_data = UserSearchResult(id=db_user.id, email=db_user.email, name=db_user.name, region=db_user.region, gender=db_user.gender)
+        user_data = UserSearchResult.from_orm(db_user)
         es.index(index="users", id=db_user.id, body=user_data.dict())
 
     return db_user
