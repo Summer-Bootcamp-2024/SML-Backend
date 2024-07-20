@@ -28,8 +28,6 @@ async def create_chatroom(chatroom: ChatroomCreate, session: AsyncSession) -> Ch
     new_chatroom = ChatRoom(
         user1_id=chatroom.user1_id,
         user2_id=chatroom.user2_id,
-        created_at=chatroom.created_at or datetime.utcnow(),
-        updated_at=chatroom.updated_at or datetime.utcnow()
     )
     session.add(new_chatroom)
     await session.commit()

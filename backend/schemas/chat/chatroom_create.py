@@ -8,8 +8,6 @@ formatted_timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 class ChatroomCreate(BaseModel):
     user1_id: int
     user2_id: int
-    created_at: Optional[datetime] = formatted_timestamp
-    updated_at: Optional[datetime] = formatted_timestamp
 
     class Config:
         orm_mode = True
