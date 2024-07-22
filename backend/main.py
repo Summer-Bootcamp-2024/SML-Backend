@@ -5,10 +5,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from Backend.backend.models.user import User
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
+from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from Backend.backend.api.api import api_router
-from Backend.backend.api.endpoints import introduction_request  # 추가
 from Backend.backend.database import create_tables, get_db
 from Backend.backend.schemas.search.search_schema import UserSearchResult
 from Backend.backend.utils.chat import manager
@@ -18,10 +18,12 @@ from Backend.backend.crud.message_crud import create_message
 from Backend.backend.schemas.chat.messages import MessageCreate
 
 origins = [
-    "http://localhost:5173"
+    "*"
 ]
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 app.add_middleware(
     CORSMiddleware,
