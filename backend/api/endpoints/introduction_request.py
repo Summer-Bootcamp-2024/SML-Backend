@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from Backend.backend.crud.introduction_request_crud import IntroductionRequestService
@@ -13,10 +14,10 @@ async def create_introduction_request(request: IntroductionRequestCreate, db: As
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/{request_id}", status_code=status.HTTP_200_OK, response_model=IntroductionRequest)
-async def get_introduction_request(request_id: int, db: AsyncSession = Depends(get_db)):
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[IntroductionRequest])
+async def get_introduction_requests(user_id: int, db: AsyncSession = Depends(get_db)):
     try:
-        return await IntroductionRequestService.get_introduction_request(db, request_id)
+        return await IntroductionRequestService.get_introduction_requests(db, user_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

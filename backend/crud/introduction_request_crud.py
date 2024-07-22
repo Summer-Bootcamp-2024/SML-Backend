@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from Backend.backend.models.introduction_requests import IntroductionRequest
 from Backend.backend.schemas.introduction.introduction_request import IntroductionRequestCreate, IntroductionRequestUpdate
 
@@ -13,14 +13,16 @@ class IntroductionRequestService:
         return introduction_request
 
     @staticmethod
-    async def get_introduction_request(db: AsyncSession, request_id: int):
+    async def get_introduction_requests(db: AsyncSession, user_id: int):
         result = await db.execute(
-            select(IntroductionRequest).where(IntroductionRequest.id == request_id)
+            select(IntroductionRequest).where(
+                and_(
+                    IntroductionRequest.intermediary_user_id == user_id,
+                    IntroductionRequest.status == "pending"
+                )
+            )
         )
-        introduction_request = result.scalars().first()
-        if introduction_request is None:
-            raise ValueError("Introduction request not found")
-        return introduction_request
+        return result.scalars().all()
 
     @staticmethod
     async def update_introduction_request(db: AsyncSession, request_id: int, status: str):
