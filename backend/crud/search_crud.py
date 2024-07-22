@@ -15,11 +15,11 @@ async def search_users_by_filters(filters: SearchFilters, session: AsyncSession)
     if not friends:
         return []
 
-    # 친구 ID 리스트 생성
-    friend_ids = [friend.friend_id for friend in friends]
+        # 1촌 친구 목록 가져옴 (중복 제거)
+    first_friend_ids = {friend.friend_id for friend in await get_friends(user_id, session, max_depth=1)}
 
-    # 중복 제거
-    friend_ids = list(set(friend_ids))
+    # 1촌을 제외한 2촌 친구 ID 리스트 생성 (중복 제거)
+    second_friend_ids = list(set(friend.friend_id for friend in friends) - first_friend_ids)
 
     # Elasticsearch 인덱스 매핑 확인
     index_mapping = es.indices.get_mapping(index="users")
@@ -41,7 +41,7 @@ async def search_users_by_filters(filters: SearchFilters, session: AsyncSession)
                     "filter": [
                         {
                             "terms": {
-                                "id": friend_ids
+                                "id": second_friend_ids
                             }
                         }
                     ]
