@@ -14,7 +14,7 @@ async def create_introduction_request(request: IntroductionRequestCreate, db: As
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=List[IntroductionRequest])
+@router.get("/{user_id}", status_code=status.HTTP_200_OK, response_model=List[IntroductionRequest])
 async def get_introduction_requests(user_id: int, db: AsyncSession = Depends(get_db)):
     try:
         return await IntroductionRequestService.get_introduction_requests(db, user_id)
