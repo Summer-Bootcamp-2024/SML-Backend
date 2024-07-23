@@ -1,3 +1,4 @@
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 from Backend.backend.models.user import User
@@ -40,3 +41,8 @@ async def create_gift_transaction(db: Session, gift: GiftSend):
         return db_gift
 
     return None
+
+async def get_user_name(db: AsyncSession, user_id: int) -> str:
+    result = await db.execute(select(User.name).filter(User.id == user_id))
+    user = result.scalars().first()
+    return user if user else "Unknown"
