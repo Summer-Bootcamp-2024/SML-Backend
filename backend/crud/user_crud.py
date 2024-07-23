@@ -2,16 +2,15 @@ from fastapi import UploadFile, File
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
-from Backend.backend.models.chatrooms import ChatRoom
-from Backend.backend.models.friends import Friend
-from Backend.backend.models.messages import Message
-from Backend.backend.models.user import User
-from Backend.backend.schemas.search.search_schema import UserSearchResult
-from Backend.backend.schemas.user.user_create import UserCreate
-from Backend.backend.schemas.user.user_update import UserUpdate
-from Backend.backend.utils.index_user import es
-from Backend.backend.utils.s3_util import create_s3_url
+from ..models.chatrooms import ChatRoom
+from ..models.friends import Friend
+from ..models.messages import Message
+from ..models.user import User
+from ..schemas.search.search_schema import UserSearchResult
+from ..schemas.user.user_create import UserCreate
+from ..schemas.user.user_update import UserUpdate
+from ..utils.index_user import es
+from ..utils.s3_util import create_s3_url
 
 
 async def get_user(db: AsyncSession, user_id: int):
@@ -23,8 +22,9 @@ async def create_user(db: AsyncSession, user: UserCreate):
         email=user.email,
         password=user.password,
         name=user.name,
-        region=user.region,
-        gender=user.gender
+        age=user.age,
+        gender=user.gender,
+        category=user.category
     )
 
     db.add(db_user)
@@ -35,6 +35,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
     es.index(index="users", id=db_user.id, body=user_data.dict())
 
     return db_user
+
 # 사용자 업데이트
 async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
     db_user = await get_user(db, user_id)

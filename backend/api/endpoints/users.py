@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Cookie, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
-from Backend.backend.crud.auth_crud import get_user_by_email
-from Backend.backend.crud.user_crud import create_user, get_user, update_user, delete_user, update_profile_img
-from Backend.backend.database import get_db
-from Backend.backend.schemas.user.user_create import UserCreate
-from Backend.backend.schemas.user.user_schema import User
-from Backend.backend.schemas.user.user_update import UserUpdate
-from Backend.backend.utils.redis_connection import get_redis_connection
+from ...crud.auth_crud import get_user_by_email
+from ...crud.user_crud import create_user, get_user, update_user, delete_user, update_profile_img
+from ...database import get_db
+from ...schemas.user.user_create import UserCreate
+from ...schemas.user.user_schema import User
+from ...schemas.user.user_update import UserUpdate
+from ...utils.redis_connection import get_redis_connection
 
 router = APIRouter()
 
