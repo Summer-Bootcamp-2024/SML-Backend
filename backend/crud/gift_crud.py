@@ -12,21 +12,17 @@ async def create_gift_transaction(db: Session, gift: GiftSend):
     receiver_result = await db.execute(select(User).filter(User.id == gift.friend_id))
     receiver = receiver_result.scalars().first()
 
-    connector_result = await db.execute(select(User).filter(User.id == gift.connector_id))
-    connector = connector_result.scalars().first()
-
-    if sender and receiver and connector:
+    if sender and receiver:
         if sender.credit < gift.ct_money:
             return None
 
         # 크레딧 차감 및 증가
         sender.credit -= gift.ct_money
-        receiver.credit += int(gift.ct_money * 0.9)
-        connector.credit += int(gift.ct_money * 0.1)
+        receiver.credit += gift.ct_money
+
 
         db.add(sender)
         db.add(receiver)
-        db.add(connector)
 
         # 트랜잭션 기록 생성
         db_gift = CreditTransaction(
