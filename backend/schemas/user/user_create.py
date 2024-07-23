@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -12,8 +10,4 @@ class UserCreate(BaseModel):
     name: str
     age: int
     gender: str
-    region: str
-    job: Optional[str] = None
-    company: Optional[str] = None
-    category: Optional[str] = None
-    image_url: Optional[str] = None
+    category: str
