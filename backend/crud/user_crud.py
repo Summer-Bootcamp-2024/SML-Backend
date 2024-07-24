@@ -24,6 +24,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
         name=user.name,
         age=user.age,
         gender=user.gender,
+        job=user.job,
         category=user.category
     )
 

@@ -10,4 +10,5 @@ class UserCreate(BaseModel):
     name: str
     age: int
     gender: str
+    job: str
     category: str
