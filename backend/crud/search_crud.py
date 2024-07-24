@@ -9,6 +9,7 @@ from Backend.backend.utils.index_user import es
 async def search_users_by_filters(filters: SearchFilters, session: AsyncSession) -> List[UserSearchResult]:
     user_id = filters.user_id
     search = filters.search
+    filter_by = filters.filter_by
 
     # 친구 목록 가져옴
     friends = await get_friends(user_id, session)
@@ -26,18 +27,18 @@ async def search_users_by_filters(filters: SearchFilters, session: AsyncSession)
     print(index_mapping)
     # Elasticsearch 쿼리 구성
     try:
+        must_query = {
+            "multi_match": {
+                "query": search,
+                "fields": [filter_by] if filter_by else ["category", "company", "job"],  # 필터링 조건 적용
+                "analyzer": "ngram_analyzer"
+            }
+        }
+
         query = {
             "query": {
                 "bool": {
-                    "must": [
-                        {
-                            "multi_match": {
-                                "query": search,
-                                "fields": ["category", "company"],
-                                "analyzer": "ngram_analyzer"  # n-gram 검색 분석기 사용
-                            }
-                        }
-                    ],
+                    "must": [must_query],
                     "filter": [
                         {
                             "terms": {

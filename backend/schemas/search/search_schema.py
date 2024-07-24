@@ -19,3 +19,4 @@ class UserSearchResult(BaseModel):
 class SearchFilters(BaseModel):
     user_id: int
     search: str
+    filter_by: Optional[str] = None
