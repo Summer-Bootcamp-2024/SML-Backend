@@ -4,8 +4,8 @@ from pydantic import BaseModel
 class UserSearchResult(BaseModel):
     id: int
     name: str
-    region: str
     gender: str
+    region: Optional[str] = None
     age: Optional[int] = None
     job: Optional[str] = None
     company: Optional[str] = None

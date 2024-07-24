@@ -10,13 +10,13 @@ formatted_timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 class User(BaseModel):
     id: int
     name: str
-    region: str
     gender: str
-    status: Optional[str] = None
-    age: Optional[int] = None
-    job: Optional[str] = None
+    age: int
+    job: str
+    category: str
+    region: Optional[str] = None
     company: Optional[str] = None
-    category: Optional[str] = None
+    status: Optional[str] = None
     image_url: Optional[str] = default_profile_url
     credit: Optional[int] = None
     created_at: Optional[datetime] = formatted_timestamp
