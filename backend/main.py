@@ -17,9 +17,7 @@ from Backend.backend.utils.redis_connection import get_redis_connection
 from Backend.backend.crud.message_crud import create_message
 from Backend.backend.schemas.chat.messages import MessageCreate
 
-origins = [
-    "*"
-]
+origins = ["http://localhost:5173"]
 
 app = FastAPI()
 
