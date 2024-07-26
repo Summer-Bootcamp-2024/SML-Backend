@@ -1,0 +1,11 @@
+from .auth import router as auth_router
+from .chatrooms import router as chatrooms_router
+from .credit import router as credit_router
+from .friends import router as friends_router
+from .gift import router as gift_router
+from .introduction_request import router as introduction_request_router
+from .messages import router as messages_router
+from .relationships import router as relationships_router
+from .search import router as search_router
+from .transactions import router as transactions_router
+from .users import router as users_router
