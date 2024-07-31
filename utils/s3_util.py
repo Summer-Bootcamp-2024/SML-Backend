@@ -10,7 +10,7 @@ bucket_name = os.getenv("S3_BUCKET_NAME")
 s3_region = os.getenv("S3_REGION")
 s3_access_key_id = os.getenv("S3_ACCESS_KEY_ID")
 s3_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
-default_profile_url = f"https://{bucket_name}.s3.{s3_region}.amazonaws.com/default_profile.png"
+default_profile_url = f"https://{bucket_name}.s3.{s3_region}.amazonaws.com/default-profile.png"
 
 class Connect:
     def __init__(self):
