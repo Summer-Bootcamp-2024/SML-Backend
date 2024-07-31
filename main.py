@@ -10,13 +10,13 @@ from .api.api import api_router
 from .database import create_tables, get_db
 from .models import User
 from .schemas import UserSearchResult, MessageCreate
-from .utils import manager, index_users, get_redis_connection
+from .utils import manager, index_users, get_redis_connection, bucket_name, s3_region
 from .crud.message_crud import create_message
 from prometheus_fastapi_instrumentator import Instrumentator
 
-origins = ["http://localhost:", "http://sml-m.site"]
+origins = ["http://localhost:", "http://sml-m.site", f"https://{bucket_name}.s3.{s3_region}.amazonaws.com/"]
 
-app = FastAPI()
+app = FastAPI(docs_url='/api/docs', openapi_url='/api/openapi.json')
 
 Instrumentator().instrument(app).expose(app)
 
