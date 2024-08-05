@@ -47,11 +47,6 @@ async def startup_event():
 async def shutdown_event():
     await app.state.redis.aclose()
 
-@app.get("/")
-def read_root():
-    index_path = Path(__file__).parent / "templates" / "index.html"
-    return HTMLResponse(index_path.read_text())
-
 @app.websocket("/ws/{room_id}/{sender_id}")
 async def websocket_endpoint(websocket: WebSocket, room_id: int, sender_id: int, session: AsyncSession = Depends(get_db)):
     await manager.connect(websocket, room_id)  # WebSocket 연결 처리
