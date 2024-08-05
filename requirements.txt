@@ -1,12 +1,15 @@
-fastapi==0.111.0
-uvicorn==0.30.1
+aioredis==2.0.1
 alembic==1.13.2
-psycopg2-binary==2.9.9
-sqlalchemy==2.0.31
 asyncpg==0.29.0
+boto3==1.34.145
 crud==0.1
+elasticsearch==7.10.1
+fastapi==0.111.0
+prometheus-fastapi-instrumentator==7.0.0
+psycopg2-binary==2.9.9
+pydantic==2.8.2
 python-dotenv==1.0.1
 redis==5.0.7
-aioredis==2.0.1
-pydantic==2.8.2 # 이메일 형식
-passlib==1.7.4  # 비밀번호 암호화
+sqlalchemy==2.0.31
+uvicorn==0.30.1
+websockets==12.0

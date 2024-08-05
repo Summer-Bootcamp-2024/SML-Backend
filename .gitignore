@@ -307,7 +307,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+../.env
 .venv
 env/
 venv/
@@ -349,8 +349,8 @@ cython_debug/
 ### Python Patch ###
 # Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
 poetry.toml
-.env
-.env
+../.env
+../.env
 # ruff
 .ruff_cache/
 
